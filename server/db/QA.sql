@@ -5,7 +5,7 @@ CREATE DATABASE QASection;
 
 DROP TABLE IF EXISTS questions CASCADE;
 CREATE TABLE questions (
-  id SERIAL PRIMARY KEY,
+  id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   product_id INT NOT NULL,
   body VARCHAR(1000),
   date_written BIGINT NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE questions (
 
 DROP TABLE IF EXISTS answers CASCADE;
 CREATE TABLE answers (
-  id SERIAL PRIMARY KEY,
+  id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   body VARCHAR(1000) NOT NULL,
   date_written BIGINT NOT NULL,
   answerer_name VARCHAR(255) NOT NULL,
@@ -31,18 +31,25 @@ CREATE TABLE answers (
 
 DROP TABLE IF EXISTS answer_photos;
 CREATE TABLE answer_photos (
-  id SERIAL PRIMARY KEY,
+  id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   "url" VARCHAR(1000) NOT NULL,
   answer_id INT NOT NULL,
   FOREIGN KEY (answer_id)
     REFERENCES answers(id)
 );
 
-\COPY questions(id , product_id, body, date_written, asker_name, asker_email, reported, helpful) FROM '/Users/roycechun/Desktop/RFP2205/Atelier-Backend/data/questions.csv' CSV HEADER;
+-- \COPY questions(id , product_id, body, date_written, asker_name, asker_email, reported, helpful) FROM '/Users/roycechun/Desktop/RFP2205/Atelier-Backend/data/questions.csv' CSV HEADER;
 
-\COPY answers(id, question_id, body, date_written, answerer_name, answerer_email, reported, helpful) FROM '/Users/roycechun/Desktop/RFP2205/Atelier-Backend/data/answers.csv' CSV HEADER;
+-- \COPY answers(id, question_id, body, date_written, answerer_name, answerer_email, reported, helpful) FROM '/Users/roycechun/Desktop/RFP2205/Atelier-Backend/data/answers.csv' CSV HEADER;
 
-\COPY answer_photos(id, answer_id, url) FROM '/Users/roycechun/Desktop/RFP2205/Atelier-Backend/data/answers_photos.csv' CSV HEADER;
+-- \COPY answer_photos(id, answer_id, url) FROM '/Users/roycechun/Desktop/RFP2205/Atelier-Backend/data/answers_photos.csv' CSV HEADER;
+
+
+\COPY questions(id , product_id, body, date_written, asker_name, asker_email, reported, helpful) FROM '/data/questions.csv' CSV HEADER;
+
+\COPY answers(id, question_id, body, date_written, answerer_name, answerer_email, reported, helpful) FROM '/data/answers.csv' CSV HEADER;
+
+\COPY answer_photos(id, answer_id, url) FROM '/data/answers_photos.csv' CSV HEADER;
 
 ALTER TABLE questions
 ALTER COLUMN date_written TYPE timestamp
@@ -56,14 +63,20 @@ USING to_timestamp(date_written / 1000::numeric);
 CREATE INDEX idx_questions_productID ON questions(product_id);
 CREATE INDEX idx_answers_questionID ON answers(question_id);
 CREATE INDEX idx_photos_answerID ON answer_photos(answer_id);
+CREATE INDEX idx_question_reported ON questions(reported);
+CREATE INDEX idx_answer_reported ON answers(reported);
 
 
-select setval( pg_get_serial_sequence('questions', 'id'),
-               (select max(id) from questions)
-             );
-select setval( pg_get_serial_sequence('answers', 'id'),
-               (select max(id) from answers)
-             );
-select setval( pg_get_serial_sequence('answer_photos', 'id'),
-               (select max(id) from answer_photos)
-             );
+SELECT setval('questions_id_seq', (SELECT MAX(id) from questions));
+SELECT setval('answers_id_seq', (SELECT MAX(id) from answers));
+SELECT setval('answer_photos_id_seq', (SELECT MAX(id) from answer_photos));
+
+-- select setval( pg_get_serial_sequence('questions', 'id'),
+--                (select max(id) from questions)
+--              );
+-- select setval( pg_get_serial_sequence('answers', 'id'),
+--                (select max(id) from answers)
+--              );
+-- select setval( pg_get_serial_sequence('answer_photos', 'id'),
+--                (select max(id) from answer_photos)
+--              );

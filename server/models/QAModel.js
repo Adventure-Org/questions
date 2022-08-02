@@ -29,7 +29,7 @@ exports.getQuestions = (req, res) => {
 
   const values = [product_id, count, offset];
 
-  pool.query(`SELECT
+  pool.query(`EXPLAIN SELECT
   q.id as question_id,
   q.body as question_body,
   q.date_written as question_date,
@@ -54,10 +54,10 @@ exports.getQuestions = (req, res) => {
     FROM
       answers a
     WHERE
-      a.question_id = q.id
+      a.question_id = q.id AND a.reported = false
   ) as answers
 FROM questions q
-WHERE q.product_id = $1
+WHERE q.product_id = $1 AND q.reported = false
 GROUP BY q.id LIMIT $2 OFFSET $3;`, values)
     .then((result) => {
       responseObj.product_id = product_id;
@@ -100,11 +100,11 @@ exports.getAnswers = (req, res) => {
         FROM
           answer_photos p
         WHERE
-          a.id = p.answer_id AND a.reported = false) as photos
+          a.id = p.answer_id) as photos
     FROM
       answers a
     WHERE
-      a.question_id = $1 AND q.reported = false LIMIT $2 OFFSET $3;`, values)
+      a.question_id = $1 AND a.reported = false LIMIT $2 OFFSET $3;`, values)
     .then((result) => {
       responseObj.question = question_id;
       responseObj.page = page;
