@@ -1,0 +1,12 @@
+.env
+node_modules
+**/bundle.js
+**/bundle.js.map
+**/bundle.js.map.gz
+test
+coverage
+_tests_
+.DS_Store
+**/package-lock.json
+data/
+.eslintrc.json
