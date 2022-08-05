@@ -22,4 +22,6 @@ export default () => {
     ['GET', `${url}/qa/questions?product_id=998849`],
     ['GET', `${url}/qa/questions/3514862/answers`],
   ]);
+
 };
+
