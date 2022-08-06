@@ -30,7 +30,7 @@ exports.getQuestions = (req, res) => {
 
   const values = [product_id, count, offset];
 
-  pool.query(`EXPLAIN SELECT
+  pool.query(`SELECT
   q.id as question_id,
   q.body as question_body,
   q.date_written as question_date,
